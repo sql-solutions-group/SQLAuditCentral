@@ -1,0 +1,1173 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Report xmlns:rd="http://schemas.microsoft.com/SQLServer/reporting/reportdesigner" xmlns="http://schemas.microsoft.com/sqlserver/reporting/2008/01/reportdefinition">
+  <DataSources>
+    <DataSource Name="SQLAudit">
+      <DataSourceReference>SQLAudit</DataSourceReference>
+      <rd:DataSourceID>9198f258-2771-4e85-a0e5-6b2836f4e32f</rd:DataSourceID>
+    </DataSource>
+  </DataSources>
+  <DataSets>
+    <DataSet Name="DDLActionsByClassDataSet">
+      <Fields>
+        <Field Name="EventDate">
+          <DataField>EventDate</DataField>
+          <rd:TypeName>System.DateTime</rd:TypeName>
+        </Field>
+        <Field Name="server_instance_name">
+          <DataField>server_instance_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="database_principal_name">
+          <DataField>database_principal_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="database_name">
+          <DataField>database_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="action_name">
+          <DataField>action_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="class_type_desc">
+          <DataField>class_type_desc</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="securable_class_desc">
+          <DataField>securable_class_desc</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+        <Field Name="DDLActionCount">
+          <DataField>DDLActionCount</DataField>
+          <rd:TypeName>System.Int32</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>SQLAudit</DataSourceName>
+        <CommandText>SELECT     EventDate, server_instance_name, database_principal_name, database_name, action_name, class_type_desc, securable_class_desc, 
+                      DDLActionCount
+FROM         aud.rptAggDDLActionsByClass
+WHERE     (EventDate &gt;= @StartTime) AND (EventDate &lt;= @EndTime) AND server_instance_name IN ( @Instance_name) AND database_name IN (@DB_Name)AND class_type_desc IN (@Class_Type) AND action_name IN (@Action_Name) 
+ORDER BY server_instance_name, securable_class_desc, class_type_desc, action_name, database_name</CommandText>
+        <QueryParameters>
+          <QueryParameter Name="@StartTime">
+            <Value>=Parameters!StartTime.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@EndTime">
+            <Value>=Parameters!EndTime.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@Instance_name">
+            <Value>=Parameters!Instance_name.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@DB_Name">
+            <Value>=Parameters!DB_Name.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@Class_Type">
+            <Value>=Parameters!Class_Type.Value</Value>
+          </QueryParameter>
+          <QueryParameter Name="@Action_Name">
+            <Value>=Parameters!Action_Name.Value</Value>
+          </QueryParameter>
+        </QueryParameters>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+    </DataSet>
+    <DataSet Name="SQLInstanceDataSet">
+      <Fields>
+        <Field Name="server_instance_name">
+          <DataField>server_instance_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>SQLAudit</DataSourceName>
+        <CommandText>SELECT     DISTINCT   server_instance_name
+FROM            aud.AuditedObject
+WHERE        (server_instance_name &lt;&gt; '')
+ORDER BY server_instance_name</CommandText>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+    </DataSet>
+    <DataSet Name="ClassTypeDataSet">
+      <Fields>
+        <Field Name="class_type_desc">
+          <DataField>class_type_desc</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>SQLAudit</DataSourceName>
+        <CommandText>SELECT Distinct class_type_desc
+  FROM [aud].[AuditedClassType]
+Union
+Select ''
+  order by class_type_desc</CommandText>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+    </DataSet>
+    <DataSet Name="ActionsDataSet">
+      <Fields>
+        <Field Name="action_name">
+          <DataField>action_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>SQLAudit</DataSourceName>
+        <CommandText>SELECT Distinct action_name
+  FROM [aud].auditedAction
+union 
+Select ''
+  order by action_name</CommandText>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+    </DataSet>
+    <DataSet Name="DBDataSet">
+      <Fields>
+        <Field Name="database_name">
+          <DataField>database_name</DataField>
+          <rd:TypeName>System.String</rd:TypeName>
+        </Field>
+      </Fields>
+      <Query>
+        <DataSourceName>SQLAudit</DataSourceName>
+        <CommandText>SELECT Distinct [database_name]
+FROM [aud].[AuditedObject]
+Where database_name &lt;&gt; '' and  (server_instance_name IN ( @Instance_name))
+Union
+Select ''
+Order by database_name</CommandText>
+        <QueryParameters>
+          <QueryParameter Name="@Instance_name">
+            <Value>=Parameters!Instance_name.Value</Value>
+          </QueryParameter>
+        </QueryParameters>
+        <rd:UseGenericDesigner>true</rd:UseGenericDesigner>
+      </Query>
+    </DataSet>
+  </DataSets>
+  <Body>
+    <ReportItems>
+      <Tablix Name="ServerActionsByClassTablix">
+        <TablixCorner>
+          <TablixCornerRows>
+            <TablixCornerRow>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox4">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Server Instance Name</Value>
+                            <Style>
+                              <FontWeight>Bold</FontWeight>
+                              <Color>White</Color>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox4</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Color>LightGrey</Color>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>SlateBlue</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox7">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Securable Class</Value>
+                            <Style>
+                              <FontWeight>Bold</FontWeight>
+                              <Color>White</Color>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox7</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Color>LightGrey</Color>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>SlateBlue</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox9">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Class Type</Value>
+                            <Style>
+                              <FontWeight>Bold</FontWeight>
+                              <Color>White</Color>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox9</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Color>LightGrey</Color>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>SlateBlue</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox11">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Action Name</Value>
+                            <Style>
+                              <FontWeight>Bold</FontWeight>
+                              <Color>White</Color>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox11</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Color>LightGrey</Color>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>SlateBlue</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+              <TablixCornerCell>
+                <CellContents>
+                  <Textbox Name="Textbox13">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>Database Name</Value>
+                            <Style>
+                              <FontWeight>Bold</FontWeight>
+                              <Color>White</Color>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>Textbox13</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Color>LightGrey</Color>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>SlateBlue</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixCornerCell>
+            </TablixCornerRow>
+          </TablixCornerRows>
+        </TablixCorner>
+        <TablixBody>
+          <TablixColumns>
+            <TablixColumn>
+              <Width>1.12959in</Width>
+            </TablixColumn>
+          </TablixColumns>
+          <TablixRows>
+            <TablixRow>
+              <Height>0.29687in</Height>
+              <TablixCells>
+                <TablixCell>
+                  <CellContents>
+                    <Textbox Name="DDLActionCount">
+                      <CanGrow>true</CanGrow>
+                      <KeepTogether>true</KeepTogether>
+                      <Paragraphs>
+                        <Paragraph>
+                          <TextRuns>
+                            <TextRun>
+                              <Value>=Sum(Fields!DDLActionCount.Value)</Value>
+                              <Style>
+                                <FontSize>11pt</FontSize>
+                                <FontWeight>Bold</FontWeight>
+                                <TextDecoration>Underline</TextDecoration>
+                                <Color>Blue</Color>
+                              </Style>
+                            </TextRun>
+                          </TextRuns>
+                          <Style />
+                        </Paragraph>
+                      </Paragraphs>
+                      <rd:DefaultName>DDLActionCount</rd:DefaultName>
+                      <ActionInfo>
+                        <Actions>
+                          <Action>
+                            <Drillthrough>
+                              <ReportName>H- DDL Actions By Actions</ReportName>
+                              <Parameters>
+                                <Parameter Name="Instance_name">
+                                  <Value>=Fields!server_instance_name.Value</Value>
+                                </Parameter>
+                                <Parameter Name="Class_type">
+                                  <Value>=Fields!class_type_desc.Value</Value>
+                                </Parameter>
+                                <Parameter Name="Action_name">
+                                  <Value>=Fields!action_name.Value</Value>
+                                </Parameter>
+                                <Parameter Name="DB_Name">
+                                  <Value>=Fields!database_name.Value</Value>
+                                </Parameter>
+                                <Parameter Name="EventDate">
+                                  <Value>=Fields!EventDate.Value</Value>
+                                </Parameter>
+                              </Parameters>
+                            </Drillthrough>
+                          </Action>
+                        </Actions>
+                      </ActionInfo>
+                      <Style>
+                        <Border>
+                          <Color>LightGrey</Color>
+                          <Style>Solid</Style>
+                        </Border>
+                        <BackgroundColor>=IIf(RowNumber("ServerActionsByClassTablix") Mod 2 ,"White" , "#ECE9D8")</BackgroundColor>
+                        <PaddingLeft>2pt</PaddingLeft>
+                        <PaddingRight>2pt</PaddingRight>
+                        <PaddingTop>2pt</PaddingTop>
+                        <PaddingBottom>2pt</PaddingBottom>
+                      </Style>
+                    </Textbox>
+                  </CellContents>
+                </TablixCell>
+              </TablixCells>
+            </TablixRow>
+          </TablixRows>
+        </TablixBody>
+        <TablixColumnHierarchy>
+          <TablixMembers>
+            <TablixMember>
+              <Group Name="EventDate">
+                <GroupExpressions>
+                  <GroupExpression>=Fields!EventDate.Value</GroupExpression>
+                </GroupExpressions>
+              </Group>
+              <SortExpressions>
+                <SortExpression>
+                  <Value>=Fields!EventDate.Value</Value>
+                  <Direction>Descending</Direction>
+                </SortExpression>
+              </SortExpressions>
+              <TablixHeader>
+                <Size>0.31771in</Size>
+                <CellContents>
+                  <Textbox Name="EventDate">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>=Fields!EventDate.Value</Value>
+                            <Style>
+                              <FontWeight>Bold</FontWeight>
+                              <Format>MM/dd/yy</Format>
+                              <Color>White</Color>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>EventDate</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Color>LightGrey</Color>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>SlateBlue</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixHeader>
+            </TablixMember>
+          </TablixMembers>
+        </TablixColumnHierarchy>
+        <TablixRowHierarchy>
+          <TablixMembers>
+            <TablixMember>
+              <Group Name="server_instance_name">
+                <GroupExpressions>
+                  <GroupExpression>=Fields!server_instance_name.Value</GroupExpression>
+                </GroupExpressions>
+              </Group>
+              <TablixHeader>
+                <Size>2.16083in</Size>
+                <CellContents>
+                  <Textbox Name="server_instance_name">
+                    <CanGrow>true</CanGrow>
+                    <KeepTogether>true</KeepTogether>
+                    <Paragraphs>
+                      <Paragraph>
+                        <TextRuns>
+                          <TextRun>
+                            <Value>=Fields!server_instance_name.Value</Value>
+                            <Style>
+                              <FontSize>11pt</FontSize>
+                              <FontWeight>Bold</FontWeight>
+                            </Style>
+                          </TextRun>
+                        </TextRuns>
+                        <Style />
+                      </Paragraph>
+                    </Paragraphs>
+                    <rd:DefaultName>server_instance_name</rd:DefaultName>
+                    <Style>
+                      <Border>
+                        <Color>LightGrey</Color>
+                        <Style>Solid</Style>
+                      </Border>
+                      <BackgroundColor>=IIf(RowNumber("ServerActionsByClassTablix") Mod 2 ,"White" , "#ECE9D8")</BackgroundColor>
+                      <PaddingLeft>2pt</PaddingLeft>
+                      <PaddingRight>2pt</PaddingRight>
+                      <PaddingTop>2pt</PaddingTop>
+                      <PaddingBottom>2pt</PaddingBottom>
+                    </Style>
+                  </Textbox>
+                </CellContents>
+              </TablixHeader>
+              <TablixMembers>
+                <TablixMember>
+                  <Group Name="securable_class_desc">
+                    <GroupExpressions>
+                      <GroupExpression>=Fields!securable_class_desc.Value</GroupExpression>
+                    </GroupExpressions>
+                  </Group>
+                  <SortExpressions>
+                    <SortExpression>
+                      <Value>=Fields!securable_class_desc.Value</Value>
+                    </SortExpression>
+                  </SortExpressions>
+                  <TablixHeader>
+                    <Size>1.37792in</Size>
+                    <CellContents>
+                      <Textbox Name="securable_class_desc">
+                        <CanGrow>true</CanGrow>
+                        <KeepTogether>true</KeepTogether>
+                        <Paragraphs>
+                          <Paragraph>
+                            <TextRuns>
+                              <TextRun>
+                                <Value>=Fields!securable_class_desc.Value</Value>
+                                <Style />
+                              </TextRun>
+                            </TextRuns>
+                            <Style />
+                          </Paragraph>
+                        </Paragraphs>
+                        <rd:DefaultName>securable_class_desc</rd:DefaultName>
+                        <Style>
+                          <Border>
+                            <Color>LightGrey</Color>
+                            <Style>Solid</Style>
+                          </Border>
+                          <BackgroundColor>=IIf(RowNumber("ServerActionsByClassTablix") Mod 2 ,"White" , "#ECE9D8")</BackgroundColor>
+                          <PaddingLeft>2pt</PaddingLeft>
+                          <PaddingRight>2pt</PaddingRight>
+                          <PaddingTop>2pt</PaddingTop>
+                          <PaddingBottom>2pt</PaddingBottom>
+                        </Style>
+                      </Textbox>
+                    </CellContents>
+                  </TablixHeader>
+                  <TablixMembers>
+                    <TablixMember>
+                      <Group Name="class_type_desc">
+                        <GroupExpressions>
+                          <GroupExpression>=Fields!class_type_desc.Value</GroupExpression>
+                        </GroupExpressions>
+                      </Group>
+                      <SortExpressions>
+                        <SortExpression>
+                          <Value>=Fields!class_type_desc.Value</Value>
+                        </SortExpression>
+                      </SortExpressions>
+                      <TablixHeader>
+                        <Size>2.78417in</Size>
+                        <CellContents>
+                          <Textbox Name="class_type_desc">
+                            <CanGrow>true</CanGrow>
+                            <KeepTogether>true</KeepTogether>
+                            <Paragraphs>
+                              <Paragraph>
+                                <TextRuns>
+                                  <TextRun>
+                                    <Value>=Fields!class_type_desc.Value</Value>
+                                    <Style>
+                                      <FontWeight>Bold</FontWeight>
+                                    </Style>
+                                  </TextRun>
+                                </TextRuns>
+                                <Style />
+                              </Paragraph>
+                            </Paragraphs>
+                            <rd:DefaultName>class_type_desc</rd:DefaultName>
+                            <Style>
+                              <Border>
+                                <Color>LightGrey</Color>
+                                <Style>Solid</Style>
+                              </Border>
+                              <BackgroundColor>=IIf(RowNumber("ServerActionsByClassTablix") Mod 2 ,"White" , "#ECE9D8")</BackgroundColor>
+                              <PaddingLeft>2pt</PaddingLeft>
+                              <PaddingRight>2pt</PaddingRight>
+                              <PaddingTop>2pt</PaddingTop>
+                              <PaddingBottom>2pt</PaddingBottom>
+                            </Style>
+                          </Textbox>
+                        </CellContents>
+                      </TablixHeader>
+                      <TablixMembers>
+                        <TablixMember>
+                          <Group Name="action_name">
+                            <GroupExpressions>
+                              <GroupExpression>=Fields!action_name.Value</GroupExpression>
+                            </GroupExpressions>
+                          </Group>
+                          <SortExpressions>
+                            <SortExpression>
+                              <Value>=Fields!action_name.Value</Value>
+                            </SortExpression>
+                          </SortExpressions>
+                          <TablixHeader>
+                            <Size>2.24249in</Size>
+                            <CellContents>
+                              <Textbox Name="action_name">
+                                <CanGrow>true</CanGrow>
+                                <KeepTogether>true</KeepTogether>
+                                <Paragraphs>
+                                  <Paragraph>
+                                    <TextRuns>
+                                      <TextRun>
+                                        <Value>=Fields!action_name.Value</Value>
+                                        <Style>
+                                          <FontWeight>Bold</FontWeight>
+                                        </Style>
+                                      </TextRun>
+                                    </TextRuns>
+                                    <Style />
+                                  </Paragraph>
+                                </Paragraphs>
+                                <rd:DefaultName>action_name</rd:DefaultName>
+                                <ActionInfo>
+                                  <Actions>
+                                    <Action>
+                                      <Drillthrough>
+                                        <ReportName>H- DDL Actions By Actions</ReportName>
+                                        <Parameters>
+                                          <Parameter Name="Instance_name">
+                                            <Value>=Fields!server_instance_name.Value</Value>
+                                          </Parameter>
+                                          <Parameter Name="Class_type">
+                                            <Value>=Fields!class_type_desc.Value</Value>
+                                          </Parameter>
+                                          <Parameter Name="Action_name">
+                                            <Value>=Fields!action_name.Value</Value>
+                                          </Parameter>
+                                          <Parameter Name="EventDate">
+                                            <Value>=Fields!EventDate.Value</Value>
+                                          </Parameter>
+                                        </Parameters>
+                                      </Drillthrough>
+                                    </Action>
+                                  </Actions>
+                                </ActionInfo>
+                                <Style>
+                                  <Border>
+                                    <Color>LightGrey</Color>
+                                    <Style>Solid</Style>
+                                  </Border>
+                                  <BackgroundColor>=IIf(RowNumber("ServerActionsByClassTablix") Mod 2 ,"White" , "#ECE9D8")</BackgroundColor>
+                                  <PaddingLeft>2pt</PaddingLeft>
+                                  <PaddingRight>2pt</PaddingRight>
+                                  <PaddingTop>2pt</PaddingTop>
+                                  <PaddingBottom>2pt</PaddingBottom>
+                                </Style>
+                              </Textbox>
+                            </CellContents>
+                          </TablixHeader>
+                          <TablixMembers>
+                            <TablixMember>
+                              <Group Name="database_name">
+                                <GroupExpressions>
+                                  <GroupExpression>=Fields!database_name.Value</GroupExpression>
+                                </GroupExpressions>
+                              </Group>
+                              <SortExpressions>
+                                <SortExpression>
+                                  <Value>=Fields!database_name.Value</Value>
+                                </SortExpression>
+                              </SortExpressions>
+                              <TablixHeader>
+                                <Size>2.34667in</Size>
+                                <CellContents>
+                                  <Textbox Name="database_name">
+                                    <CanGrow>true</CanGrow>
+                                    <KeepTogether>true</KeepTogether>
+                                    <Paragraphs>
+                                      <Paragraph>
+                                        <TextRuns>
+                                          <TextRun>
+                                            <Value>=Fields!database_name.Value</Value>
+                                            <Style>
+                                              <FontWeight>Bold</FontWeight>
+                                              <Color>Maroon</Color>
+                                            </Style>
+                                          </TextRun>
+                                        </TextRuns>
+                                        <Style />
+                                      </Paragraph>
+                                    </Paragraphs>
+                                    <rd:DefaultName>database_name</rd:DefaultName>
+                                    <Style>
+                                      <Border>
+                                        <Color>LightGrey</Color>
+                                        <Style>Solid</Style>
+                                      </Border>
+                                      <BackgroundColor>=IIf(RowNumber("ServerActionsByClassTablix") Mod 2 ,"White" , "#ECE9D8")</BackgroundColor>
+                                      <PaddingLeft>2pt</PaddingLeft>
+                                      <PaddingRight>2pt</PaddingRight>
+                                      <PaddingTop>2pt</PaddingTop>
+                                      <PaddingBottom>2pt</PaddingBottom>
+                                    </Style>
+                                  </Textbox>
+                                </CellContents>
+                              </TablixHeader>
+                              <TablixMembers>
+                                <TablixMember />
+                              </TablixMembers>
+                              <Visibility>
+                                <Hidden>true</Hidden>
+                                <ToggleItem>action_name</ToggleItem>
+                              </Visibility>
+                            </TablixMember>
+                          </TablixMembers>
+                          <Visibility>
+                            <Hidden>true</Hidden>
+                            <ToggleItem>class_type_desc</ToggleItem>
+                          </Visibility>
+                        </TablixMember>
+                      </TablixMembers>
+                      <Visibility>
+                        <Hidden>true</Hidden>
+                        <ToggleItem>securable_class_desc</ToggleItem>
+                      </Visibility>
+                    </TablixMember>
+                  </TablixMembers>
+                  <Visibility>
+                    <Hidden>true</Hidden>
+                    <ToggleItem>server_instance_name</ToggleItem>
+                  </Visibility>
+                </TablixMember>
+              </TablixMembers>
+            </TablixMember>
+          </TablixMembers>
+        </TablixRowHierarchy>
+        <RepeatColumnHeaders>true</RepeatColumnHeaders>
+        <RepeatRowHeaders>true</RepeatRowHeaders>
+        <DataSetName>DDLActionsByClassDataSet</DataSetName>
+        <Top>3.32292in</Top>
+        <Left>0.02792in</Left>
+        <Height>0.61458in</Height>
+        <Width>12.04167in</Width>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Tablix>
+      <Image Name="SQL">
+        <Source>Embedded</Source>
+        <Value>sql_F</Value>
+        <Sizing>FitProportional</Sizing>
+        <Top>0.03833in</Top>
+        <Left>0.02792in</Left>
+        <Height>0.82292in</Height>
+        <Width>0.89583in</Width>
+        <ZIndex>1</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+        </Style>
+      </Image>
+      <Textbox Name="Textbox15">
+        <CanGrow>true</CanGrow>
+        <KeepTogether>true</KeepTogether>
+        <Paragraphs>
+          <Paragraph>
+            <TextRuns>
+              <TextRun>
+                <Value>DDL Actions Overview</Value>
+                <Style>
+                  <FontSize>16pt</FontSize>
+                  <FontWeight>Bold</FontWeight>
+                  <Color>DarkBlue</Color>
+                </Style>
+              </TextRun>
+            </TextRuns>
+            <Style />
+          </Paragraph>
+        </Paragraphs>
+        <rd:DefaultName>Textbox15</rd:DefaultName>
+        <Top>0.43417in</Top>
+        <Left>1.09042in</Left>
+        <Height>0.42708in</Height>
+        <Width>3.795in</Width>
+        <ZIndex>2</ZIndex>
+        <Style>
+          <Border>
+            <Style>None</Style>
+          </Border>
+          <PaddingLeft>2pt</PaddingLeft>
+          <PaddingRight>2pt</PaddingRight>
+          <PaddingTop>2pt</PaddingTop>
+          <PaddingBottom>2pt</PaddingBottom>
+        </Style>
+      </Textbox>
+      <Chart Name="ServerActionsChart">
+        <ChartCategoryHierarchy>
+          <ChartMembers>
+            <ChartMember>
+              <Group Name="Chart1_CategoryGroup1">
+                <GroupExpressions>
+                  <GroupExpression>=Fields!EventDate.Value</GroupExpression>
+                </GroupExpressions>
+              </Group>
+              <SortExpressions>
+                <SortExpression>
+                  <Value>=Fields!EventDate.Value</Value>
+                  <Direction>Descending</Direction>
+                </SortExpression>
+              </SortExpressions>
+              <Label>=Fields!EventDate.Value</Label>
+            </ChartMember>
+          </ChartMembers>
+        </ChartCategoryHierarchy>
+        <ChartSeriesHierarchy>
+          <ChartMembers>
+            <ChartMember>
+              <Group Name="Chart1_SeriesGroup1">
+                <GroupExpressions>
+                  <GroupExpression>=Fields!server_instance_name.Value</GroupExpression>
+                </GroupExpressions>
+              </Group>
+              <Label>=Fields!server_instance_name.Value</Label>
+            </ChartMember>
+          </ChartMembers>
+        </ChartSeriesHierarchy>
+        <ChartData>
+          <ChartSeriesCollection>
+            <ChartSeries Name="DDLActionCount">
+              <ChartDataPoints>
+                <ChartDataPoint>
+                  <ChartDataPointValues>
+                    <Y>=Sum(Fields!DDLActionCount.Value)</Y>
+                  </ChartDataPointValues>
+                  <ChartDataLabel>
+                    <Style />
+                  </ChartDataLabel>
+                  <ToolTip>=Sum(Fields!DDLActionCount.Value)</ToolTip>
+                  <Style />
+                  <ChartMarker>
+                    <Style />
+                  </ChartMarker>
+                  <DataElementOutput>Output</DataElementOutput>
+                </ChartDataPoint>
+              </ChartDataPoints>
+              <Style />
+              <ChartEmptyPoints>
+                <Style />
+                <ChartMarker>
+                  <Style />
+                </ChartMarker>
+                <ChartDataLabel>
+                  <Style />
+                </ChartDataLabel>
+              </ChartEmptyPoints>
+              <CustomProperties>
+                <CustomProperty>
+                  <Name>DrawingStyle</Name>
+                  <Value>Cylinder</Value>
+                </CustomProperty>
+              </CustomProperties>
+              <ValueAxisName>Primary</ValueAxisName>
+              <CategoryAxisName>Primary</CategoryAxisName>
+              <ChartSmartLabel>
+                <CalloutLineColor>Black</CalloutLineColor>
+                <MinMovingDistance>0pt</MinMovingDistance>
+              </ChartSmartLabel>
+            </ChartSeries>
+          </ChartSeriesCollection>
+        </ChartData>
+        <ChartAreas>
+          <ChartArea Name="Default">
+            <ChartCategoryAxes>
+              <ChartAxis Name="Primary">
+                <Style>
+                  <FontSize>8pt</FontSize>
+                  <Format>MM/dd/yy</Format>
+                </Style>
+                <ChartAxisTitle>
+                  <Caption>Event Date</Caption>
+                  <Style>
+                    <FontSize>8pt</FontSize>
+                  </Style>
+                </ChartAxisTitle>
+                <VariableAutoInterval>true</VariableAutoInterval>
+                <ChartMajorGridLines>
+                  <Enabled>False</Enabled>
+                  <Style>
+                    <Border>
+                      <Color>Gainsboro</Color>
+                    </Border>
+                  </Style>
+                </ChartMajorGridLines>
+                <ChartMinorGridLines>
+                  <Style>
+                    <Border>
+                      <Color>Gainsboro</Color>
+                      <Style>Dotted</Style>
+                    </Border>
+                  </Style>
+                </ChartMinorGridLines>
+                <ChartMinorTickMarks>
+                  <Enabled>True</Enabled>
+                  <Length>0.5</Length>
+                </ChartMinorTickMarks>
+                <CrossAt>NaN</CrossAt>
+                <Minimum>NaN</Minimum>
+                <Maximum>NaN</Maximum>
+              </ChartAxis>
+              <ChartAxis Name="Secondary">
+                <Style>
+                  <FontSize>8pt</FontSize>
+                </Style>
+                <ChartAxisTitle>
+                  <Caption>Axis Title</Caption>
+                  <Style>
+                    <FontSize>8pt</FontSize>
+                  </Style>
+                </ChartAxisTitle>
+                <ChartMajorGridLines>
+                  <Enabled>False</Enabled>
+                  <Style>
+                    <Border>
+                      <Color>Gainsboro</Color>
+                    </Border>
+                  </Style>
+                </ChartMajorGridLines>
+                <ChartMinorGridLines>
+                  <Style>
+                    <Border>
+                      <Color>Gainsboro</Color>
+                      <Style>Dotted</Style>
+                    </Border>
+                  </Style>
+                </ChartMinorGridLines>
+                <ChartMinorTickMarks>
+                  <Length>0.5</Length>
+                </ChartMinorTickMarks>
+                <CrossAt>NaN</CrossAt>
+                <Location>Opposite</Location>
+                <Minimum>NaN</Minimum>
+                <Maximum>NaN</Maximum>
+              </ChartAxis>
+            </ChartCategoryAxes>
+            <ChartValueAxes>
+              <ChartAxis Name="Primary">
+                <Style>
+                  <FontSize>8pt</FontSize>
+                  <Format>#,0;(#,0)</Format>
+                </Style>
+                <ChartAxisTitle>
+                  <Caption>DDL Actions Count</Caption>
+                  <Style>
+                    <FontSize>8pt</FontSize>
+                  </Style>
+                </ChartAxisTitle>
+                <VariableAutoInterval>true</VariableAutoInterval>
+                <ChartMajorGridLines>
+                  <Style>
+                    <Border>
+                      <Color>Gainsboro</Color>
+                    </Border>
+                  </Style>
+                </ChartMajorGridLines>
+                <ChartMinorGridLines>
+                  <Style>
+                    <Border>
+                      <Color>Gainsboro</Color>
+                      <Style>Dotted</Style>
+                    </Border>
+                  </Style>
+                </ChartMinorGridLines>
+                <ChartMinorTickMarks>
+                  <Length>0.5</Length>
+                </ChartMinorTickMarks>
+                <CrossAt>NaN</CrossAt>
+                <Minimum>NaN</Minimum>
+                <Maximum>NaN</Maximum>
+              </ChartAxis>
+              <ChartAxis Name="Secondary">
+                <Style>
+                  <FontSize>8pt</FontSize>
+                </Style>
+                <ChartAxisTitle>
+                  <Caption>Axis Title</Caption>
+                  <Style>
+                    <FontSize>8pt</FontSize>
+                  </Style>
+                </ChartAxisTitle>
+                <ChartMajorGridLines>
+                  <Style>
+                    <Border>
+                      <Color>Gainsboro</Color>
+                    </Border>
+                  </Style>
+                </ChartMajorGridLines>
+                <ChartMinorGridLines>
+                  <Style>
+                    <Border>
+                      <Color>Gainsboro</Color>
+                      <Style>Dotted</Style>
+                    </Border>
+                  </Style>
+                </ChartMinorGridLines>
+                <ChartMinorTickMarks>
+                  <Length>0.5</Length>
+                </ChartMinorTickMarks>
+                <CrossAt>NaN</CrossAt>
+                <Location>Opposite</Location>
+                <Minimum>NaN</Minimum>
+                <Maximum>NaN</Maximum>
+              </ChartAxis>
+            </ChartValueAxes>
+            <ChartThreeDProperties>
+              <Enabled>true</Enabled>
+              <Clustered>true</Clustered>
+            </ChartThreeDProperties>
+            <Style>
+              <BackgroundGradientType>None</BackgroundGradientType>
+            </Style>
+          </ChartArea>
+        </ChartAreas>
+        <ChartLegends>
+          <ChartLegend Name="Default">
+            <Style>
+              <BackgroundGradientType>None</BackgroundGradientType>
+              <FontSize>8pt</FontSize>
+            </Style>
+            <ChartLegendTitle>
+              <Caption />
+              <Style>
+                <FontSize>8pt</FontSize>
+                <FontWeight>Bold</FontWeight>
+                <TextAlign>Center</TextAlign>
+              </Style>
+            </ChartLegendTitle>
+            <HeaderSeparatorColor>Black</HeaderSeparatorColor>
+            <ColumnSeparatorColor>Black</ColumnSeparatorColor>
+          </ChartLegend>
+        </ChartLegends>
+        <ChartTitles>
+          <ChartTitle Name="Default">
+            <Caption>DDL Actions</Caption>
+            <Style>
+              <BackgroundGradientType>None</BackgroundGradientType>
+              <FontWeight>Bold</FontWeight>
+              <TextAlign>General</TextAlign>
+              <VerticalAlign>Top</VerticalAlign>
+            </Style>
+          </ChartTitle>
+        </ChartTitles>
+        <Palette>BrightPastel</Palette>
+        <ChartBorderSkin>
+          <Style>
+            <BackgroundColor>Gray</BackgroundColor>
+            <BackgroundGradientType>None</BackgroundGradientType>
+            <Color>White</Color>
+          </Style>
+        </ChartBorderSkin>
+        <ChartNoDataMessage Name="NoDataMessage">
+          <Caption>No Data Available</Caption>
+          <Style>
+            <BackgroundGradientType>None</BackgroundGradientType>
+            <TextAlign>General</TextAlign>
+            <VerticalAlign>Top</VerticalAlign>
+          </Style>
+        </ChartNoDataMessage>
+        <DataSetName>DDLActionsByClassDataSet</DataSetName>
+        <Top>1.03125in</Top>
+        <Left>0.02792in</Left>
+        <Height>2.25in</Height>
+        <Width>8.32292in</Width>
+        <ZIndex>3</ZIndex>
+        <Style>
+          <Border>
+            <Color>LightGrey</Color>
+            <Style>Solid</Style>
+          </Border>
+          <BackgroundColor>White</BackgroundColor>
+          <BackgroundGradientType>None</BackgroundGradientType>
+        </Style>
+      </Chart>
+    </ReportItems>
+    <Height>3.9375in</Height>
+    <Style />
+  </Body>
+  <ReportParameters>
+    <ReportParameter Name="Instance_name">
+      <DataType>String</DataType>
+      <Prompt>Instance name</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>SQLInstanceDataSet</DataSetName>
+          <ValueField>server_instance_name</ValueField>
+          <LabelField>server_instance_name</LabelField>
+        </DataSetReference>
+      </ValidValues>
+      <MultiValue>true</MultiValue>
+    </ReportParameter>
+    <ReportParameter Name="Class_Type">
+      <DataType>String</DataType>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>Class Type</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>ClassTypeDataSet</DataSetName>
+          <ValueField>class_type_desc</ValueField>
+          <LabelField>class_type_desc</LabelField>
+        </DataSetReference>
+      </ValidValues>
+      <MultiValue>true</MultiValue>
+    </ReportParameter>
+    <ReportParameter Name="Action_Name">
+      <DataType>String</DataType>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>Action Name</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>ActionsDataSet</DataSetName>
+          <ValueField>action_name</ValueField>
+          <LabelField>action_name</LabelField>
+        </DataSetReference>
+      </ValidValues>
+      <MultiValue>true</MultiValue>
+    </ReportParameter>
+    <ReportParameter Name="DB_Name">
+      <DataType>String</DataType>
+      <AllowBlank>true</AllowBlank>
+      <Prompt>DB Name</Prompt>
+      <ValidValues>
+        <DataSetReference>
+          <DataSetName>DBDataSet</DataSetName>
+          <ValueField>database_name</ValueField>
+          <LabelField>database_name</LabelField>
+        </DataSetReference>
+      </ValidValues>
+      <MultiValue>true</MultiValue>
+    </ReportParameter>
+    <ReportParameter Name="StartTime">
+      <DataType>DateTime</DataType>
+      <Prompt>Start Time</Prompt>
+    </ReportParameter>
+    <ReportParameter Name="EndTime">
+      <DataType>DateTime</DataType>
+      <Prompt>End Time</Prompt>
+    </ReportParameter>
+  </ReportParameters>
+  <Width>12.06959in</Width>
+  <Page>
+    <LeftMargin>1in</LeftMargin>
+    <RightMargin>1in</RightMargin>
+    <TopMargin>1in</TopMargin>
+    <BottomMargin>1in</BottomMargin>
+    <Style />
+  </Page>
+  <EmbeddedImages>
+    <EmbeddedImage Name="sql_F">
+      <MIMEType>image/jpeg</MIMEType>
+      <ImageData>/9j/4AAQSkZJRgABAgAAZABkAAD/5QBMTUVESUFCSU5fRElEQiAjTUIlOntFNjUzNjEyRC1GMEUxLTQ2Q0UtODBEQy05NjhEQTYzMzVCOTV9VEtYVE1FRElBQklOOiVNQiP/7AARRHVja3kAAQAEAAAAZAAA/+0ALFBob3Rvc2hvcCAzLjAAOEJJTQPtAAAAAAAQAEgAAAABAAEASAAAAAEAAf/hA9VodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvADw/eHBhY2tldCBiZWdpbj0n77u/JyBpZD0nVzVNME1wQ2VoaUh6cmVTek5UY3prYzlkJz8+IDx4OnhtcG1ldGEgeG1sbnM6eD0nYWRvYmU6bnM6bWV0YS8nIHg6eG1wdGs9J1hNUCB0b29sa2l0IDIuOS05LCBmcmFtZXdvcmsgMS42Jz4KPHJkZjpSREYgeG1sbnM6cmRmPSdodHRwOi8vd3d3LnczLm9yZy8xOTk5LzAyLzIyLXJkZi1zeW50YXgtbnMjJyB4bWxuczppWD0naHR0cDovL25zLmFkb2JlLmNvbS9pWC8xLjAvJz4KPHJkZjpEZXNjcmlwdGlvbiByZGY6YWJvdXQ9JycgeG1sbnM6eGFwPSdodHRwOi8vbnMuYWRvYmUuY29tL3hhcC8xLjAvJyB4YXA6TWV0YWRhdGFEYXRlPScyMDA1LTA0LTI2VDE5OjEyOjQ0Wic+PC9yZGY6RGVzY3JpcHRpb24+CjxyZGY6RGVzY3JpcHRpb24gcmRmOmFib3V0PScnIHhtbG5zOmRjPSdodHRwOi8vcHVybC5vcmcvZGMvZWxlbWVudHMvMS4xLyc+PGRjOnN1YmplY3Q+PHJkZjpCYWc+PHJkZjpsaT50ZWNobmV0PC9yZGY6bGk+PHJkZjpsaT52aXJ0dWFsIGxhYjwvcmRmOmxpPjxyZGY6bGk+U1FMPC9yZGY6bGk+PC9yZGY6QmFnPjwvZGM6c3Vi
+amVjdD48L3JkZjpEZXNjcmlwdGlvbj4KPHJkZjpEZXNjcmlwdGlvbiBJRD0naHR0cDovL25zLmFkb2JlLmNvbS94YXAvMS4wLyc+PGlYOmNoYW5nZXM+PHJkZjpCYWc+PHJkZjpsaT5LZXl3b3JkcywyMDA1LTA0LTI2VDE5OjEyOjQ0Wiw2LHM8L3JkZjpsaT48L3JkZjpCYWc+PC9pWDpjaGFuZ2VzPjwvcmRmOkRlc2NyaXB0aW9uPjxyZGY6RGVzY3JpcHRpb24gSUQ9J2h0dHA6Ly9wdXJsLm9yZy9kYy9lbGVtZW50cy8xLjEvJz48aVg6Y2hhbmdlcz48cmRmOkJhZz48cmRmOmxpPnN1YmplY3QsMjAwNS0wNC0yNlQxOToxMjo0NFosNSxzPC9yZGY6bGk+PC9yZGY6QmFnPjwvaVg6Y2hhbmdlcz48L3JkZjpEZXNjcmlwdGlvbj48L3JkZjpSREY+CjwveDp4bXBtZXRhPgo8P3hwYWNrZXQgZW5kPSd3Jz8+/9sAQwABAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAQEBAgICAgICAgICAgIDAwMDAwMDAwMD/9sAQwEBAQEBAQECAQECAgIBAgIDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMDAwMD/8AAEQgANwA3AwERAAIRAQMRAf/EAB8AAAEFAQEBAQEBAAAAAAAAAAABAgMEBQYHCAkKC//EALUQAAIBAwMCBAMFBQQEAAABfQECAwAEEQUSITFBBhNRYQcicRQygZGhCCNCscEVUtHwJDNicoIJChYXGBkaJSYnKCkqNDU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6g4SFhoeIiYqSk5SVlpeYmZqio6Slpqeoqaqys7S1tre4ubrCw8TFxsfIycrS09TV1tfY2drh
+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</ImageData>
+    </EmbeddedImage>
+  </EmbeddedImages>
+  <rd:ReportID>ca2259b1-2d63-4dae-8cd2-6010db376565</rd:ReportID>
+  <rd:ReportUnitType>Inch</rd:ReportUnitType>
+</Report>

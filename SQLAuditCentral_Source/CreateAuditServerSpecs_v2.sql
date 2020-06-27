@@ -1,0 +1,110 @@
+/*
+	Author:			Ayad Shammout
+	Date:			10/19/2011
+	Description:	Create SQL Server Audit and Server Audit Specification
+	Note:			**** Run this script in SQLCMD mode ****
+*/
+
+USE [master]
+GO
+
+/* Set your variables here */
+:setvar AuditlogPath "\\NetworkShare\sqlaudit_logs\"
+:setvar AuditLogArchivePath "\\NetworkShare\sqlaudit_logs\Archive\"
+:setvar DatabaseName "SQLAuditRepository"
+
+
+Declare @MachineName varchar(260), @InstanceName varchar(128), @str nvarchar(4000)
+
+Select @MachineName = CAST(SERVERPROPERTY(N'MachineName') AS varchar(260)), 
+       @InstanceName = CAST(SERVERPROPERTY(N'InstanceName') AS varchar(128))
+
+
+/****** Object:  Audit [SQLAudit$SERVERNAME$INSTANCENAME]    Script Date: 09/14/2010 16:04:00 ******/
+
+If @InstanceName IS NOT NULL
+
+Set @str = '
+CREATE SERVER AUDIT [SQLAudit$'+@MachineName+'$'+@InstanceName+']
+TO FILE 
+(	FILEPATH = ''$(AuditlogPath)''
+	,MAXSIZE = 100 MB
+	,MAX_ROLLOVER_FILES = 2147483647
+	,RESERVE_DISK_SPACE = ON
+)
+WITH
+(	QUEUE_DELAY = 1000
+	,ON_FAILURE = CONTINUE
+
+)
+
+'
+Else
+Set @str = '
+CREATE SERVER AUDIT [SQLAudit$'+@MachineName+']
+TO FILE 
+(	FILEPATH = ''$(AuditlogPath)''
+	,MAXSIZE = 100 MB
+	,MAX_ROLLOVER_FILES = 2147483647
+	,RESERVE_DISK_SPACE = ON
+)
+WITH
+(	QUEUE_DELAY = 1000
+	,ON_FAILURE = CONTINUE
+
+)
+
+'
+
+Execute sp_executesql @str
+
+
+If @InstanceName IS NOT NULL
+
+Set @str = '
+	-- PLEASE CHANGE SERVER NAME AND INSTANEC NAME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CREATE SERVER AUDIT SPECIFICATION ['+@MachineName+'$'+@InstanceName+'_AuditSpecs]
+	FOR SERVER AUDIT [SQLAudit$'+@MachineName+'$'+@InstanceName+']
+	ADD (DATABASE_ROLE_MEMBER_CHANGE_GROUP),
+	ADD (SERVER_ROLE_MEMBER_CHANGE_GROUP),
+	ADD (BACKUP_RESTORE_GROUP),
+	ADD (AUDIT_CHANGE_GROUP),
+	ADD (DATABASE_PERMISSION_CHANGE_GROUP),
+	ADD (SERVER_OBJECT_PERMISSION_CHANGE_GROUP),
+	ADD (SERVER_PERMISSION_CHANGE_GROUP),
+	ADD (FAILED_LOGIN_GROUP),
+	ADD (DATABASE_CHANGE_GROUP),
+	ADD (SERVER_OBJECT_CHANGE_GROUP),
+	ADD (SERVER_PRINCIPAL_CHANGE_GROUP),
+	ADD (SERVER_OPERATION_GROUP),
+	ADD (APPLICATION_ROLE_CHANGE_PASSWORD_GROUP),
+	ADD (LOGIN_CHANGE_PASSWORD_GROUP),
+	ADD (SERVER_STATE_CHANGE_GROUP),
+	ADD (SERVER_OBJECT_OWNERSHIP_CHANGE_GROUP)
+	WITH (STATE = ON)
+	'
+Else
+   	Set @str = '
+   	-- PLEASE CHANGE SERVER NAME AND INSTANEC NAME !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+	CREATE SERVER AUDIT SPECIFICATION ['+@MachineName+'_AuditSpecs]
+	FOR SERVER AUDIT [SQLAudit$'+@MachineName+']
+	ADD (DATABASE_ROLE_MEMBER_CHANGE_GROUP),
+	ADD (SERVER_ROLE_MEMBER_CHANGE_GROUP),
+	ADD (BACKUP_RESTORE_GROUP),
+	ADD (AUDIT_CHANGE_GROUP),
+	ADD (DATABASE_PERMISSION_CHANGE_GROUP),
+	ADD (SERVER_OBJECT_PERMISSION_CHANGE_GROUP),
+	ADD (SERVER_PERMISSION_CHANGE_GROUP),
+	ADD (FAILED_LOGIN_GROUP),
+	ADD (DATABASE_CHANGE_GROUP),
+	ADD (SERVER_OBJECT_CHANGE_GROUP),
+	ADD (SERVER_PRINCIPAL_CHANGE_GROUP),
+	ADD (SERVER_OPERATION_GROUP),
+	ADD (APPLICATION_ROLE_CHANGE_PASSWORD_GROUP),
+	ADD (LOGIN_CHANGE_PASSWORD_GROUP),
+	ADD (SERVER_STATE_CHANGE_GROUP),
+	ADD (SERVER_OBJECT_OWNERSHIP_CHANGE_GROUP)
+	WITH (STATE = ON)
+	'
+
+Execute sp_executesql @str

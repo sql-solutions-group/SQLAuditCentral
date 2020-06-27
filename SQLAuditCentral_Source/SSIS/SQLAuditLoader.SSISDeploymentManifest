@@ -1,0 +1,1 @@
+<?xml version="1.0"?><DTSDeploymentManifest GeneratedBy="NORTHAMERICA\andyrob" GeneratedFromProjectName="SQLAuditLoader" GeneratedDate="2008-08-11T10:09:24.6186141-04:00" AllowConfigurationChanges="true"><Package>LoadLogsPackage.dtsx</Package><ConfigurationFile>LoadLogsPackageConfig.dtsConfig</ConfigurationFile></DTSDeploymentManifest>
