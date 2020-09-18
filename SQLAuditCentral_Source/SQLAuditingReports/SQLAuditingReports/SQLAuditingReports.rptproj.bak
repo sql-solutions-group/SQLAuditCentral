@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema">
+  <State>$base64$PFNvdXJjZUNvbnRyb2xJbmZvIHhtbG5zOnhzZD0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEiIHhtbG5zOnhzaT0iaHR0cDovL3d3dy53My5vcmcvMjAwMS9YTUxTY2hlbWEtaW5zdGFuY2UiIHhtbG5zOmRkbDI9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDAzL2VuZ2luZS8yIiB4bWxuczpkZGwyXzI9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDAzL2VuZ2luZS8yLzIiIHhtbG5zOmRkbDEwMF8xMDA9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vYW5hbHlzaXNzZXJ2aWNlcy8yMDA4L2VuZ2luZS8xMDAvMTAwIiB4bWxuczpkd2Q9Imh0dHA6Ly9zY2hlbWFzLm1pY3Jvc29mdC5jb20vRGF0YVdhcmVob3VzZS9EZXNpZ25lci8xLjAiPg0KICA8RW5hYmxlZD5mYWxzZTwvRW5hYmxlZD4NCiAgPFByb2plY3ROYW1lPjwvUHJvamVjdE5hbWU+DQogIDxBdXhQYXRoPjwvQXV4UGF0aD4NCiAgPExvY2FsUGF0aD48L0xvY2FsUGF0aD4NCiAgPFByb3ZpZGVyPjwvUHJvdmlkZXI+DQo8L1NvdXJjZUNvbnRyb2xJbmZvPg==</State>
+  <DataSources>
+    <ProjectItem>
+      <Name>SQLAudit.rds</Name>
+      <FullPath>SQLAudit.rds</FullPath>
+    </ProjectItem>
+  </DataSources>
+  <Reports>
+    <ProjectItem>
+      <Name>1- Overview - Server Actions.rdl</Name>
+      <FullPath>1- Overview - Server Actions.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>1a- Server Actions By SQL Instance.rdl</Name>
+      <FullPath>1a- Server Actions By SQL Instance.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>1b- Server Actions By Database.rdl</Name>
+      <FullPath>1b- Server Actions By Database.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>1c- Server Actions By Principal.rdl</Name>
+      <FullPath>1c- Server Actions By Principal.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>2- Overview - Database Actions.rdl</Name>
+      <FullPath>2- Overview - Database Actions.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>2a- Database Actions By Instance.rdl</Name>
+      <FullPath>2a- Database Actions By Instance.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>2b- Database Actions By Database.rdl</Name>
+      <FullPath>2b- Database Actions By Database.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>2c- Database Actions By Principal.rdl</Name>
+      <FullPath>2c- Database Actions By Principal.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>3- Overview - DDL Actions.rdl</Name>
+      <FullPath>3- Overview - DDL Actions.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>3a- DDL Actions By Instance.rdl</Name>
+      <FullPath>3a- DDL Actions By Instance.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>3b- DDL Actions By Database.rdl</Name>
+      <FullPath>3b- DDL Actions By Database.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>3c- DDL Actions By Principal.rdl</Name>
+      <FullPath>3c- DDL Actions By Principal.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>4- Overview - DML Actions.rdl</Name>
+      <FullPath>4- Overview - DML Actions.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>4a- DML Actions By Instance.rdl</Name>
+      <FullPath>4a- DML Actions By Instance.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>4b- DML Actions By Database.rdl</Name>
+      <FullPath>4b- DML Actions By Database.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>4c- DML Actions By Principal.rdl</Name>
+      <FullPath>4c- DML Actions By Principal.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>H- Database Actions By Actions.rdl</Name>
+      <FullPath>H- Database Actions By Actions.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>H- DDL Actions By Actions.rdl</Name>
+      <FullPath>H- DDL Actions By Actions.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>H- DML Actions By Actions.rdl</Name>
+      <FullPath>H- DML Actions By Actions.rdl</FullPath>
+    </ProjectItem>
+    <ProjectItem>
+      <Name>H- Server Actions By Actions.rdl</Name>
+      <FullPath>H- Server Actions By Actions.rdl</FullPath>
+    </ProjectItem>
+  </Reports>
+  <Configurations>
+    <Configuration>
+      <Name>Debug</Name>
+      <Platform>Win32</Platform>
+      <Options>
+        <TargetServerURL>http://emmonsglacier/ReportServer</TargetServerURL>
+        <TargetFolder>SQL Auditing Reports</TargetFolder>
+        <TargetDataSourceFolder>Data Sources</TargetDataSourceFolder>
+        <OverwriteDataSources>true</OverwriteDataSources>
+      </Options>
+    </Configuration>
+    <Configuration>
+      <Name>DebugLocal</Name>
+      <Platform>Win32</Platform>
+      <Options>
+        <TargetFolder>SQLAuditingReports</TargetFolder>
+        <TargetDataSourceFolder>Data Sources</TargetDataSourceFolder>
+      </Options>
+    </Configuration>
+    <Configuration>
+      <Name>Release</Name>
+      <Platform>Win32</Platform>
+      <Options>
+        <TargetFolder>SQLAuditingReports</TargetFolder>
+        <TargetDataSourceFolder>Data Sources</TargetDataSourceFolder>
+      </Options>
+    </Configuration>
+  </Configurations>
+</Project>
