@@ -1,0 +1,18 @@
+<?xml version="1.0"?>
+<DTSConfiguration>
+	<DTSConfigurationHeading>
+		<DTSConfigurationFileInfo GeneratedBy="" GeneratedFromPackageName="LoadLogsPackage" GeneratedFromPackageID="{49E2AA33-E1FC-442D-9BF0-56A698029673}" GeneratedDate="8/8/2008 12:25:03 AM"/>
+	</DTSConfigurationHeading>
+	<Configuration ConfiguredType="Property" Path="\Package.LogProviders[SSIS log provider for SQL Server].Properties[ConfigString]" ValueType="String">
+		<ConfiguredValue>SqlAuditLogRepository</ConfiguredValue>
+	</Configuration>
+	<Configuration ConfiguredType="Property" Path="\Package.Connections[SqlAuditLogRepository].Properties[ConnectionString]" ValueType="String">
+		<ConfiguredValue>Data Source=.;Initial Catalog=SQL_Audit_Log;Provider=SQLNCLI10.1;Integrated Security=SSPI;Auto Translate=False;Application Name=SSIS-Package-{21C9032A-E45A-41F2-BA67-9EF35FCD18C3}SqlAuditLogRepository;</ConfiguredValue>
+	</Configuration>
+	<Configuration ConfiguredType="Property" Path="\Package.Variables[User::auditLogArchivePath].Properties[Value]" ValueType="String">
+		<ConfiguredValue>E:\CareGroup\logs\archive</ConfiguredValue>
+	</Configuration>
+	<Configuration ConfiguredType="Property" Path="\Package.Variables[User::LogFilePath].Properties[Value]" ValueType="String">
+		<ConfiguredValue>E:\CareGroup\logs</ConfiguredValue>
+	</Configuration>
+</DTSConfiguration>
